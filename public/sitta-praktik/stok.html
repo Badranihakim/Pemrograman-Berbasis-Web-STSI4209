@@ -141,7 +141,8 @@
             <h3 style="color: var(--primary-color);">Tambah Stok Baru</h3>
             <p style="margin-bottom: 15px; font-size: 0.9em;">Fitur penambahan baris data stok (Vue Data Binding)</p>
             
-            <form @submit.prevent="tambahStok" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: start;">
+            <!-- Menggunakan class .stok-form CSS Grid untuk layout form yang rapi -->
+            <form @submit.prevent="tambahStok" class="stok-form">
                  <!-- Two-way data binding (v-model) menuju instance state -->
                 <input type="text" v-model="formBaru.kode" class="input-field" placeholder="Kode Barang (Mis. EKMA4310)" required>
                 <input type="text" v-model="formBaru.judul" class="input-field" placeholder="Judul / Nama Bahan Ajar" required>
@@ -160,9 +161,11 @@
                 <input type="number" v-model="formBaru.harga" class="input-field" placeholder="Harga (Mis. 65000)" required>
                 <input type="number" v-model="formBaru.qty" class="input-field" placeholder="Jumlah Stok (Qty)" required>
                 <input type="number" v-model="formBaru.safety" class="input-field" placeholder="Safety Stok" required>
-                <input type="text" v-model="formBaru.catatanHTML" class="input-field" style="grid-column: span 2;" placeholder="Catatan HTML Opsional (Cth: <b>Baru</b>)">
+                
+                <!-- Memanfaatkan class .btn-full-span untuk occupy kolom penuh -->
+                <input type="text" v-model="formBaru.catatanHTML" class="input-field btn-full-span" placeholder="Catatan HTML Opsional (Cth: <b>Baru</b>)">
 
-                <button type="submit" class="btn-primary" style="grid-column: span 2; padding: 12px; margin-top: 10px;">Simpan Stok Baru</button>
+                <button type="submit" class="btn-primary btn-full-span" style="padding: 12px; margin-top: 10px;">Simpan Stok Baru</button>
             </form>
         </div>
         

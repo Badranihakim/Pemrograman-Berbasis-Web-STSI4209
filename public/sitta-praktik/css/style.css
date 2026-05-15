@@ -242,9 +242,23 @@ body.bg-animated {
 
 /* KELOMPOK KODE: Kontainer Utama */
 .container {
-  max-width: 1000px;
-  margin: 2rem auto;
+  max-width: 1200px; /* Menyamakan lebar kontainer dengan navbar */
+  margin: 20px auto; /* Memusatkan kontainer secara responsif */
+  width: 90%; /* Responsivitas standar pada berbagai layar */
   padding: 2rem;
+}
+
+/* KELOMPOK KODE: Layout Form menggunakan CSS Grid */
+.stok-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Membagi form menjadi 2 kolom */
+  gap: 20px; /* Jarak antar elemen grid */
+  align-items: start;
+}
+
+.btn-full-span {
+  /* Membentangkan elemen untuk menempati kedua kolom */
+  grid-column: span 2;
 }
 
 .greeting-text {
@@ -361,8 +375,13 @@ th {
     padding: 10px 15px;
     font-size: 1rem; /* Sedikit lebih kecil dari menu utama supaya hierarki terlihat */
   }
-  form#formTambahStok {
+  .stok-form {
+    /* Mengubah layout form menjadi 1 kolom pada layar HP */
     grid-template-columns: 1fr !important;
+  }
+  .btn-full-span {
+    /* Menugaskan span 1 saja karena hanya ada 1 kolom */
+    grid-column: span 1 !important;
   }
   .dashboard-grid {
     grid-template-columns: 1fr !important;
