@@ -6,51 +6,139 @@
     <title>SITTA UT - Tracking Pengiriman</title>
     <!-- KELOMPOK KODE: Mengimpor Cascading Style Sheets -->
     <link rel="stylesheet" href="css/style.css">
+    <!-- Mengimpor Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
 </head>
 <body class="bg-animated">
     
-    <!-- KELOMPOK KODE: Navigasi Menu Atas untuk rute antarmuka -->
-    <nav class="navbar glass-container">
-        <h3 class="brand" style="color: var(--primary-color)">SITTA UT</h3>
-        <!-- KELOMPOK KODE: Hamburger Menu Icon untuk Mode Mobile -->
-        <div class="hamburger" id="hamburgerMenu">&#9776;</div>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="stok.html">Informasi Bahan Ajar</a></li>
-            <li><a href="tracking.html" class="active">Tracking Pengiriman</a></li>
-            <li class="dropdown">
-                <a href="#">Laporan &#9662;</a>
-                <div class="dropdown-content glass-container">
-                    <a href="#" class="coming-soon">Monitoring Progress DO Bahan Ajar</a>
-                    <a href="#" class="coming-soon">Rekap Bahan Ajar</a>
+    <div id="app">
+        <!-- KELOMPOK KODE: Navigasi Menu Atas untuk rute antarmuka -->
+        <nav class="navbar glass-container">
+            <h3 class="brand" style="color: var(--primary-color)">SITTA UT</h3>
+            <!-- Hamburger Menu Icon untuk Mode Mobile dengan Vue @click Event -->
+            <div class="hamburger" @click="toggleMobileMenu" v-html="isMobileMenuActive ? '&#10006;' : '&#9776;'"></div>
+            <ul class="nav-links" :class="{ 'active': isMobileMenuActive }">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="stok.html">Informasi Bahan Ajar</a></li>
+                <li><a href="tracking.html" class="active">Tracking Pengiriman</a></li>
+                <li class="dropdown">
+                    <a href="#">Laporan &#9662;</a>
+                    <div class="dropdown-content glass-container">
+                        <a href="#" @click.prevent="showComingSoon">Monitoring Progress DO Bahan Ajar</a>
+                        <a href="#" @click.prevent="showComingSoon">Rekap Bahan Ajar</a>
+                    </div>
+                </li>
+                <li><a href="#" @click.prevent="showComingSoon">Histori Transaksi Bahan Ajar</a></li>
+                <li><a href="index.html" style="color: var(--danger-color)">Logout</a></li>
+            </ul>
+        </nav>
+
+        <div class="container glass-container">
+            <h2 style="color: var(--primary-color);">Tracking Pengiriman Bahan Ajar</h2>
+            <p style="margin-bottom: 20px;">Cari Nomor Delivery Order (DO) untuk melihat detail pengiriman.</p>
+            
+            <!-- Pencarian Menggunakan Vue @submit.prevent -->
+            <form @submit.prevent="lacakPengiriman" style="display: flex; gap: 10px; max-width: 500px; margin-bottom: 30px;">
+                <!-- Binding input pencarian menggunakan v-model -->
+                <input type="text" v-model="searchDO" class="input-field" placeholder="Cth: DO2025-001" required>
+                <button type="submit" class="btn-primary" style="white-space: nowrap; padding: 12px 24px;">Lacak</button>
+            </form>
+
+            <!-- Menggunakan v-if dan v-else untuk menampilkan hasil conditionally -->
+            <div id="trackingResult" class="tracking-result">
+                
+                <div v-if="hasSearched && searchResult">
+                    <h3 style="color: var(--primary-color); border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;">
+                        Hasil Pencarian: {{ searchResult.id }}
+                    </h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.7); padding: 15px; border-radius: var(--radius);">
+                        <p><strong>Nama:</strong> <span style="font-weight: 500;">{{ searchResult.nama }}</span></p>
+                        <p><strong>NIM:</strong> <span style="font-weight: 500;">{{ searchResult.nim }}</span></p>
+                        <p><strong>Paket:</strong> <span style="font-weight: 500;">{{ searchResult.paket }}</span></p>
+                        <p><strong>Ekspedisi:</strong> <span style="font-weight: 500;">{{ searchResult.ekspedisi }}</span></p>
+                        <p><strong>Tgl Kirim:</strong> <span style="font-weight: 500;">{{ searchResult.tanggalKirim }}</span></p>
+                        <p><strong>Total:</strong> <span style="font-weight: 500;">Rp {{ parseInt(searchResult.total).toLocaleString('id-ID') }}</span></p>
+                        <p><strong>Status Saat Ini:</strong> <span style="color: var(--secondary-color); font-weight: 600;">{{ searchResult.status }}</span></p>
+                    </div>
+
+                    <h4 style="margin-bottom: 10px;">Riwayat Perjalanan (Log)</h4>
+                    <ul style="list-style: none; padding: 0; background: rgba(255,255,255,0.5); border-radius: var(--radius); padding: 10px;">
+                        <!-- v-for untuk list riwayat perjalanan DO -->
+                        <li v-for="(log, lIdx) in searchResult.perjalanan" :key="'log-'+lIdx" style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dotted var(--border-color);">
+                            <span style="font-size: 0.85em; color: gray; display: block;">⏳ {{ log.waktu }}</span>
+                            <span style="font-weight: 500;">{{ log.keterangan }}</span>
+                        </li>
+                    </ul>
                 </div>
-            </li>
-            <li><a href="#" class="coming-soon">Histori Transaksi Bahan Ajar</a></li>
-            <li><a href="index.html" style="color: var(--danger-color)">Logout</a></li>
-        </ul>
-    </nav>
+                
+                <div v-else-if="hasSearched && !searchResult" style="padding: 20px; text-align: center; color: var(--danger-color); font-weight: 500;">
+                    Nomor DO <b>{{ searchDO }}</b> tidak ditemukan dalam sistem perbaruan.
+                </div>
 
-    <!-- KELOMPOK KODE: Form Pencarian dan Menampilkan Hasil Tracking Ekspedisi -->
-    <div class="container glass-container">
-        <h2 style="color: var(--primary-color);">Tracking Pengiriman Bahan Ajar</h2>
-        <p style="margin-bottom: 20px;">Masukkan Nomor / DO / Billing untuk memeriksa riwayat pengiriman.</p>
-        
-        <form id="trackingForm" style="display: flex; gap: 10px; max-width: 500px; margin-bottom: 30px;">
-            <input type="text" id="searchDO" class="input-field" placeholder="Cth: 2023001234 atau 2023005678" required>
-            <button type="submit" class="btn-primary" style="white-space: nowrap; padding: 12px 24px;">Lacak</button>
-        </form>
+                <div v-else>
+                    <p style="color: var(--text-light)">Pilih form input pencarian dan tekan tombol "Lacak" untuk menampikan detail.</p>
+                </div>
+            </div>
 
-        <!-- Area Hasil Tracking disisipkan ke div trackingResult menggunakan DOM Injection -->
-        <div id="trackingResult" class="tracking-result">
-            <p style="color: var(--text-light)">Pilih form input pencarian dan tekan tombol "Lacak" untuk menampikan detail.</p>
+            <hr style="margin: 2.5rem 0; border: 0; border-top: 1px solid var(--glass-border)">
+            
+            <h3 style="color: var(--primary-color);">Buat Transaksi DO Bahan Ajar Baru</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9em;">Fitur pembuatan DO (nomor tergenerate otomatis).</p>
+            
+            <!-- v-model binding untuk seluruh form input -->
+            <form @submit.prevent="buatDOBaru" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: start; background: rgba(255,255,255,0.6); padding: 20px; border-radius: var(--radius);">
+                
+                <div style="grid-column: span 2;">
+                    <label style="font-weight: bold; color: var(--text-dark);">Nomor DO Baru (Otomatis):</label>
+                    <input type="text" disabled :value="generateNewDO" class="input-field" style="background: #e0e0e0; font-weight: bold;">
+                </div>
+
+                <div>
+                    <label>NIM Mahasiswa:</label>
+                    <input type="text" v-model="formDO.nim" class="input-field" placeholder="1234..." required>
+                </div>
+
+                <div>
+                    <label>Nama Mahasiswa:</label>
+                    <input type="text" v-model="formDO.nama" class="input-field" placeholder="Cth: Rina Wulandari" required>
+                </div>
+                
+                <div>
+                    <label>Ekspedisi:</label>
+                    <select v-model="formDO.ekspedisi" class="input-field" required>
+                        <option disabled value="">Pilih Ekspedisi</option>
+                        <option v-for="(eksp, eIdx) in pengirimanList" :key="'eksp-'+eIdx" :value="eksp.kode">{{ eksp.nama }}</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Tanggal Kirim:</label>
+                    <input type="date" v-model="formDO.tanggalKirim" class="input-field" required>
+                </div>
+
+                <div style="grid-column: span 2;">
+                    <label>Paket Bahan Ajar:</label>
+                    <select v-model="formDO.paket" class="input-field" required>
+                        <option disabled value="">Pilih Paket Transaksi</option>
+                        <option v-for="(pkt, pIdx) in paketList" :key="'pkt-'+pIdx" :value="pkt.kode">{{ pkt.kode }} - {{ pkt.nama }}</option>
+                    </select>
+                </div>
+
+                <!-- Conditional details menggunakan v-if dari hasil computed property -->
+                <div v-if="selectedPaketDetails" style="grid-column: span 2; padding: 15px; background: rgba(255,255,255,0.8); border: 1px solid var(--primary-color); border-radius: var(--radius);">
+                    <h4 style="margin-bottom: 5px;">Rincian {{ selectedPaketDetails.nama }}</h4>
+                    <ul style="margin: 5px 0 10px 20px;">
+                        <li v-for="(isi, iIdx) in selectedPaketDetails.isi" :key="'isi-'+iIdx">Kode Barang: <b>{{ isi }}</b></li>
+                    </ul>
+                    <p style="font-weight: bold; color: green;">Total Harga: Rp {{ selectedPaketDetails.harga.toLocaleString('id-ID') }}</p>
+                </div>
+
+                <button type="submit" class="btn-primary" style="grid-column: span 2; padding: 12px; margin-top: 10px;">Simpan Transaksi Baru</button>
+            </form>
         </div>
     </div>
 
-    <!-- KELOMPOK KODE: Container kosong untuk trigger Toast Notification apabila nomor DO Error / Invalid-->
-    <div id="toast" class="toast hidden"><span id="toastMsg"></span></div>
-
-    <!-- KELOMPOK KODE: Menyisipkan file JS Dummy Data & Functionality -->
-    <script src="js/data.js"></script>
-    <script src="js/script.js"></script>
+    <!-- Mengimpor file controller Vue -->
+    <script src="js/tracking-app.js"></script>
 </body>
 </html>

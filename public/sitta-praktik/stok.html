@@ -6,83 +6,169 @@
     <title>SITTA UT - Informasi Stok Bahan Ajar</title>
     <!-- KELOMPOK KODE: Menyertakan aturan CSS yang terdefinisi di file terpisah -->
     <link rel="stylesheet" href="css/style.css">
+    <!-- KELOMPOK KODE: Mengimpor Vue.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
 </head>
 <body class="bg-animated">
     
-    <!-- KELOMPOK KODE: Susunan Navigasi Web (Navbar) -->
-    <nav class="navbar glass-container">
-        <h3 class="brand" style="color: var(--primary-color)">SITTA UT</h3>
-        <!-- KELOMPOK KODE: Hamburger Menu Icon untuk Mode Mobile -->
-        <div class="hamburger" id="hamburgerMenu">&#9776;</div>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="stok.html" class="active">Informasi Bahan Ajar</a></li>
-            <li><a href="tracking.html">Tracking Pengiriman</a></li>
-            <li class="dropdown">
-                <a href="#">Laporan &#9662;</a>
-                <div class="dropdown-content glass-container">
-                    <a href="#" class="coming-soon">Monitoring Progress DO Bahan Ajar</a>
-                    <a href="#" class="coming-soon">Rekap Bahan Ajar</a>
+    <!-- Elemen utama yang akan dikendalikan oleh Vue instance -->
+    <div id="app">
+
+        <!-- KELOMPOK KODE: Susunan Navigasi Web (Navbar) -->
+        <nav class="navbar glass-container">
+            <h3 class="brand" style="color: var(--primary-color)">SITTA UT</h3>
+            <!-- KELOMPOK KODE: Hamburger Menu Icon untuk Mode Mobile dengan Vue @click Event -->
+            <div class="hamburger" @click="toggleMobileMenu" v-html="isMobileMenuActive ? '&#10006;' : '&#9776;'"></div>
+            <ul class="nav-links" :class="{ 'active': isMobileMenuActive }">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="stok.html" class="active">Informasi Bahan Ajar</a></li>
+                <li><a href="tracking.html">Tracking Pengiriman</a></li>
+                <li class="dropdown">
+                    <a href="#">Laporan &#9662;</a>
+                    <div class="dropdown-content glass-container">
+                        <a href="#" @click.prevent="showComingSoon">Monitoring Progress DO Bahan Ajar</a>
+                        <a href="#" @click.prevent="showComingSoon">Rekap Bahan Ajar</a>
+                    </div>
+                </li>
+                <li><a href="#" @click.prevent="showComingSoon">Histori Transaksi Bahan Ajar</a></li>
+                <li><a href="index.html" style="color: var(--danger-color)">Logout</a></li>
+            </ul>
+        </nav>
+
+        <!-- KELOMPOK KODE: Bagian penampil tabel informasi bahan ajar dinamis (Vue) -->
+        <div class="container glass-container">
+            <h2 style="color: var(--primary-color);">Informasi Stok Bahan Ajar</h2>
+            <p style="margin-bottom: 20px;">Peragaan Data Bahan Ajar sesuai daftar inventaris</p>
+
+            <!-- KELOMPOK KODE: Filter dan Sorting (Dua-arah sinkronisasi dengan v-model) -->
+            <div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: var(--radius); margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;">Filter & Sort Data</h4>
+                <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                    
+                    <div>
+                        <label>UT-Daerah:</label>
+                        <select v-model="filterUpbjj" class="input-field" style="padding: 5px; width: auto;">
+                            <!-- v-for untuk me-loop list upbjjList dari Javascript -->
+                            <option value="">Semua Daerah</option>
+                            <option v-for="(upbjj, i) in upbjjList" :key="'upbjj-'+i" :value="upbjj">{{ upbjj }}</option>
+                        </select>
+                    </div>
+
+                    <!-- Dependent Option: Tampil hanya jika UT-Daerah (filterUpbjj) sudah dipilih (v-if) -->
+                    <div v-if="filterUpbjj">
+                        <label>Kategori (Dependent):</label>
+                        <select v-model="filterKategori" class="input-field" style="padding: 5px; width: auto;">
+                            <option value="">Semua Kategori</option>
+                            <option v-for="(kategori, i) in kategoriList" :key="'kat-'+i" :value="kategori">{{ kategori }}</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Sort By:</label>
+                        <select v-model="sortBy" class="input-field" style="padding: 5px; width: auto;">
+                            <option value="judul">Judul (A-Z)</option>
+                            <option value="qty">Stok (Terkecil - Terbesar)</option>
+                            <option value="harga">Harga (Murah - Mahal)</option>
+                        </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 5px; cursor:pointer;" @click="filterReorder = !filterReorder">
+                        <input type="checkbox" v-model="filterReorder" style="cursor:pointer;" />
+                        <label style="cursor:pointer;">Hanya Tampilkan Perlu Re-Order (Stok < Safety / Habis)</label>
+                    </div>
                 </div>
-            </li>
-            <li><a href="#" class="coming-soon">Histori Transaksi Bahan Ajar</a></li>
-            <li><a href="index.html" style="color: var(--danger-color)">Logout</a></li>
-        </ul>
-    </nav>
 
-    <!-- KELOMPOK KODE: Bagian penampil tabel informasi bahan ajar dinamis -->
-    <div class="container glass-container">
-        <h2 style="color: var(--primary-color);">Informasi Stok Bahan Ajar</h2>
-        <p style="margin-bottom: 20px;">Peragaan Data Bahan Ajar sesuai daftar inventaris</p>
-        
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="min-width: 80px;">Cover</th>
-                        <th style="min-width: 120px;">Kode Lokasi</th>
-                        <th style="min-width: 120px;">Kode Barang</th>
-                        <th style="min-width: 250px;">Nama Barang</th>
-                        <th style="min-width: 100px;">Stok</th>
-                    </tr>
-                </thead>
-                <!-- Tag tbody akan diinjeksi via manipulasi DOM Javascript dari data dummy JS -->
-                <tbody id="stokTableBody">
-                </tbody>
-            </table>
-        </div>
-
-        <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--glass-border)">
-        
-        <!-- KELOMPOK KODE: Formulir Penambahan Data Tabel (Operasi Push JS Array & Update View DOM) -->
-        <h3 style="color: var(--primary-color);">Tambah Stok Baru</h3>
-        <p style="margin-bottom: 15px; font-size: 0.9em;">Fitur penambahan baris data stok secara langsung (Live Update DOM)</p>
-        
-        <form id="formTambahStok" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: start;">
-            <input type="text" id="newLokasi" class="input-field" placeholder="Kode Lokasi (Mis. JKT01)" required>
-            <input type="text" id="newKode" class="input-field" placeholder="Kode Barang (Mis. EKMA4310)" required>
-            <input type="text" id="newNama" class="input-field" placeholder="Nama Bahan Ajar" required>
-            <input type="number" id="newStok" class="input-field" placeholder="Jumlah Stok" required>
+                <button @click="resetFilter" class="btn-primary" style="margin-top: 15px; padding: 6px 12px; font-size: 0.9em; border-radius: 6px;">Reset Filter</button>
+            </div>
             
-            <!-- Elemen masukan tipe file untuk mengambil data gambar cover buku -->
-            <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 8px;">
-                <label for="newCover" style="font-weight: 500; font-size: 0.9rem; color: var(--text-dark);">Pilih Gambar Cover Bahan Ajar (Opsional):</label>
-                <div style="position: relative;">
-                    <input type="file" id="newCover" accept="image/*" class="input-field file-input" style="opacity: 0; position: absolute; z-index: -1; width: 0.1px; height: 0.1px;">
-                    <label for="newCover" class="btn-primary" style="display: inline-block; padding: 10px 20px; font-size: 0.85rem; font-weight: 500; border-radius: calc(var(--radius)/3);">Unggah Gambar 📤</label>
-                    <span id="fileNameDisplay" style="margin-left: 10px; font-size: 0.85rem; color: var(--text-light);">Belum ada file dipilih</span>
-                </div>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kode</th>
+                            <th style="min-width: 250px;">Judul / Nama Barang</th>
+                            <th>Kategori</th>
+                            <th>UPBJJ</th>
+                            <th>LokRak</th>
+                            <th>Harga</th>
+                            <th>Qty</th>
+                            <th>Safety</th>
+                            <th>Status</th>
+                            <th>Catatan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Directive v-for untuk membuat baris tabel dari properties computed "filteredStok" -->
+                        <tr v-for="(item, index) in filteredStok" :key="index" :class="{ 'warning-row': item.qty < item.safety && item.qty > 0, 'danger-row': item.qty === 0 }">
+                            <!-- Menampilkan Gambar Cover Buku jika tersedia -->
+                            <td>
+                                <img v-if="item.cover" :src="item.cover" alt="Cover" style="width: 50px; height: 70px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <span v-else style="font-size: 0.8em; color: gray;">No Cover</span>
+                            </td>
+                            <!-- Directive mustaches atau teks interpolasi untuk merender teks ke html -->
+                            <td>{{ item.kode }}</td>
+                            <td style="font-weight: bold; color: var(--primary-color);">{{ item.judul }}</td>
+                            <td>{{ item.kategori }}</td>
+                            <td>{{ item.upbjj }}</td>
+                            <td>{{ item.lokasiRak }}</td>
+                            <td>Rp {{ item.harga.toLocaleString('id-ID') }}</td>
+                            <td>{{ item.qty }}</td>
+                            <td>{{ item.safety }}</td>
+                            
+                            <!-- Penggunaan v-if, v-else-if, v-else untuk menampilkan status indikator visual berdasar operator kondisi -->
+                            <td style="font-weight: 600;">
+                                <span v-if="item.qty === 0" style="color: var(--danger-color);">❌ Kosong</span>
+                                <span v-else-if="item.qty < item.safety" style="color: orange;">⚠️ Menipis</span>
+                                <span v-else style="color: var(--success-color);">✅ Aman</span>
+                            </td>
+                            
+                            <!-- Directive v-html untuk mem-parsing tag html mentah dari string data js -->
+                            <td v-html="item.catatanHTML"></td>
+                        </tr>
+                        <!-- v-if untuk memberitahu ketika filter sedang tidak memiliki data -->
+                        <tr v-if="filteredStok.length === 0">
+                            <td colspan="10" style="text-align: center; padding: 20px; font-style: italic; color: gray;">
+                                Tidak ada data yang sesuai dengan filter.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-            <button type="submit" class="btn-primary" style="grid-column: span 2; padding: 12px; margin-top: 10px;">Simpan Stok Baru ke Tabel</button>
-        </form>
+            <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--glass-border)">
+            
+            <!-- KELOMPOK KODE: Formulir Penambahan Data Tabel menggunakan v-model data binding dan event modifier @submit.prevent -->
+            <h3 style="color: var(--primary-color);">Tambah Stok Baru</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9em;">Fitur penambahan baris data stok (Vue Data Binding)</p>
+            
+            <form @submit.prevent="tambahStok" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: start;">
+                 <!-- Two-way data binding (v-model) menuju instance state -->
+                <input type="text" v-model="formBaru.kode" class="input-field" placeholder="Kode Barang (Mis. EKMA4310)" required>
+                <input type="text" v-model="formBaru.judul" class="input-field" placeholder="Judul / Nama Bahan Ajar" required>
+                
+                <select v-model="formBaru.kategori" class="input-field">
+                    <option disabled value="">Pilih Kategori</option>
+                    <option v-for="(kat, idx) in kategoriList" :key="'form-kat-'+idx" :value="kat">{{ kat }}</option>
+                </select>
+                
+                <select v-model="formBaru.upbjj" class="input-field" required>
+                    <option disabled value="">Pilih UPBJJ</option>
+                    <option v-for="(upbjj, idx) in upbjjList" :key="'form-upbjj-'+idx" :value="upbjj">{{ upbjj }}</option>
+                </select>
+
+                <input type="text" v-model="formBaru.lokasiRak" class="input-field" placeholder="Lokasi Rak (Cth: R4-B2)" required>
+                <input type="number" v-model="formBaru.harga" class="input-field" placeholder="Harga (Mis. 65000)" required>
+                <input type="number" v-model="formBaru.qty" class="input-field" placeholder="Jumlah Stok (Qty)" required>
+                <input type="number" v-model="formBaru.safety" class="input-field" placeholder="Safety Stok" required>
+                <input type="text" v-model="formBaru.catatanHTML" class="input-field" style="grid-column: span 2;" placeholder="Catatan HTML Opsional (Cth: <b>Baru</b>)">
+
+                <button type="submit" class="btn-primary" style="grid-column: span 2; padding: 12px; margin-top: 10px;">Simpan Stok Baru</button>
+            </form>
+        </div>
+        
     </div>
 
-    <!-- KELOMPOK KODE: Container Box Notifikasi keberhasilan maupun error ketika menambahkan stok-->
-    <div id="toast" class="toast hidden"><span id="toastMsg"></span></div>
-
-    <!-- KELOMPOK KODE: Mengimpor Javascript -->
-    <script src="js/data.js"></script>
-    <script src="js/script.js"></script>
+    <!-- KELOMPOK KODE: Mengimpor Javascript Vue App -->
+    <script src="js/stok-app.js"></script>
 </body>
 </html>
