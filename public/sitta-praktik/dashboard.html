@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITTA UT - Dashboard</title>
+    <!-- KELOMPOK KODE: Mengimpor Cascading Style Sheets -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-animated">
+    
+    <!-- KELOMPOK KODE: Navigasi Menu Atas untuk navigasi lintas halaman situs -->
+    <nav class="navbar glass-container">
+        <h3 class="brand" style="color: var(--primary-color)">SITTA UT</h3>
+        <!-- KELOMPOK KODE: Hamburger Menu Icon untuk Mode Mobile -->
+        <div class="hamburger" id="hamburgerMenu">&#9776;</div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="dashboard.html" class="active">Dashboard</a></li>
+            <li><a href="stok.html">Informasi Bahan Ajar</a></li>
+            <li><a href="tracking.html">Tracking Pengiriman</a></li>
+            <li class="dropdown">
+                <a href="#">Laporan &#9662;</a>
+                <div class="dropdown-content glass-container">
+                    <a href="#" class="coming-soon">Monitoring Progress DO Bahan Ajar</a>
+                    <a href="#" class="coming-soon">Rekap Bahan Ajar</a>
+                </div>
+            </li>
+            <li><a href="#" class="coming-soon">Histori Transaksi Bahan Ajar</a></li>
+            <li><a href="index.html" style="color: var(--danger-color)">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- KELOMPOK KODE: Konten Utama untuk halaman Dashboard (Greeting dan Grid Menu) -->
+    <div class="container glass-container" style="text-align: center;">
+        <!-- Menampilkan pesan sapaan sesuai jam secara dinamis -->
+        <h2 id="greeting" class="greeting-text">Selamat Datang!</h2>
+        <p style="color: var(--text-light)">Dashboard Aplikasi Web SITTA. Silakan pilih menu interaktif di bawah ini.</p>
+
+        <!-- KELOMPOK KODE: Visual / Layout Hover-effect Cards untuk Akses Cepat Menu -->
+        <div class="dashboard-grid">
+            <!-- Kartu 1: Informasi Bahan Ajar -->
+            <a href="stok.html" class="glass-container dashboard-card">
+                <!-- Ikon Buku/Dokumen (SVG) -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                </svg>
+                <h3>Informasi Bahan Ajar</h3>
+            </a>
+
+            <!-- Kartu 2: Tracking Pengiriman -->
+            <a href="tracking.html" class="glass-container dashboard-card">
+                <!-- Ikon Truk Pengiriman (SVG) -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                </svg>
+                <h3>Tracking Pengiriman</h3>
+            </a>
+
+            <!-- Kartu 3: Histori Transaksi -->
+            <a href="#" class="glass-container dashboard-card coming-soon">
+                <!-- Ikon Riwayat/Waktu (SVG) -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <h3>Histori Transaksi</h3>
+            </a>
+        </div>
+    </div>
+
+    <!-- KELOMPOK KODE: Indikator Alert Custom (Toast) untuk feedback error / notifikasi -->
+    <div id="toast" class="toast hidden"><span id="toastMsg"></span></div>
+
+    <!-- KELOMPOK KODE: Menyisipkan file JS pada halaman -->
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

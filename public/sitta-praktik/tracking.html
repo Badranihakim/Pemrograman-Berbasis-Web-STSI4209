@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITTA UT - Tracking Pengiriman</title>
+    <!-- KELOMPOK KODE: Mengimpor Cascading Style Sheets -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-animated">
+    
+    <!-- KELOMPOK KODE: Navigasi Menu Atas untuk rute antarmuka -->
+    <nav class="navbar glass-container">
+        <h3 class="brand" style="color: var(--primary-color)">SITTA UT</h3>
+        <!-- KELOMPOK KODE: Hamburger Menu Icon untuk Mode Mobile -->
+        <div class="hamburger" id="hamburgerMenu">&#9776;</div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="stok.html">Informasi Bahan Ajar</a></li>
+            <li><a href="tracking.html" class="active">Tracking Pengiriman</a></li>
+            <li class="dropdown">
+                <a href="#">Laporan &#9662;</a>
+                <div class="dropdown-content glass-container">
+                    <a href="#" class="coming-soon">Monitoring Progress DO Bahan Ajar</a>
+                    <a href="#" class="coming-soon">Rekap Bahan Ajar</a>
+                </div>
+            </li>
+            <li><a href="#" class="coming-soon">Histori Transaksi Bahan Ajar</a></li>
+            <li><a href="index.html" style="color: var(--danger-color)">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- KELOMPOK KODE: Form Pencarian dan Menampilkan Hasil Tracking Ekspedisi -->
+    <div class="container glass-container">
+        <h2 style="color: var(--primary-color);">Tracking Pengiriman Bahan Ajar</h2>
+        <p style="margin-bottom: 20px;">Masukkan Nomor / DO / Billing untuk memeriksa riwayat pengiriman.</p>
+        
+        <form id="trackingForm" style="display: flex; gap: 10px; max-width: 500px; margin-bottom: 30px;">
+            <input type="text" id="searchDO" class="input-field" placeholder="Cth: 2023001234 atau 2023005678" required>
+            <button type="submit" class="btn-primary" style="white-space: nowrap; padding: 12px 24px;">Lacak</button>
+        </form>
+
+        <!-- Area Hasil Tracking disisipkan ke div trackingResult menggunakan DOM Injection -->
+        <div id="trackingResult" class="tracking-result">
+            <p style="color: var(--text-light)">Pilih form input pencarian dan tekan tombol "Lacak" untuk menampikan detail.</p>
+        </div>
+    </div>
+
+    <!-- KELOMPOK KODE: Container kosong untuk trigger Toast Notification apabila nomor DO Error / Invalid-->
+    <div id="toast" class="toast hidden"><span id="toastMsg"></span></div>
+
+    <!-- KELOMPOK KODE: Menyisipkan file JS Dummy Data & Functionality -->
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

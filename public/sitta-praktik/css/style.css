@@ -1,0 +1,413 @@
+/* KELOMPOK KODE: Import Font Poppins dan Definisi Variabel Warna (Gen Z Aesthetic) */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #6C63FF; /* Warna utama (Bisa diubah sesuai keinginan) */
+  --secondary-color: #FF6584; /* Warna sekunder / Gradien */
+  --bg-gradient-1: #e0c3fc;
+  --bg-gradient-2: #8ec5fc;
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --text-dark: #2d3748;
+  --text-light: #718096;
+  --radius: 20px;
+  --danger-color: #ff4757;
+  --success-color: #2ed573;
+}
+
+/* KELOMPOK KODE: Reset CSS Dasar */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body.bg-animated {
+  background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2));
+  background-size: 200% 200%;
+  animation: bgMove 10s ease infinite;
+  color: var(--text-dark);
+  min-height: 100vh;
+}
+
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* KELOMPOK KODE: Utilitas CSS (Glassmorphism, dll.) */
+.glass-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius);
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.w-full { width: 100%; }
+.mt-3 { margin-top: 1rem; }
+
+/* KELOMPOK KODE: Styling Khusus Halaman Login */
+.login-box {
+  width: 100%;
+  max-width: 400px;
+  padding: 2.5rem;
+  text-align: center;
+  margin: auto;
+}
+
+.login-header h2 {
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.login-header p {
+  color: var(--text-light);
+  margin-bottom: 2rem;
+  font-size: 0.9rem;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: calc(var(--radius) / 2);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  transition: all 0.3s;
+  font-size: 0.95rem;
+}
+
+.input-field:focus {
+  outline: none;
+  background: white;
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: calc(var(--radius) / 2);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 101, 132, 0.4);
+}
+
+.login-links {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+}
+
+.login-links a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+/* KELOMPOK KODE: Styling Modal Box */
+.modal {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1000;
+}
+
+.modal.hidden { display: none; }
+
+.modal-content {
+  width: 90%;
+  max-width: 400px;
+  padding: 2rem;
+  position: relative;
+  text-align: center;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px; right: 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-dark);
+}
+
+/* KELOMPOK KODE: Toast / Custom Alert Notification */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: var(--danger-color);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+  font-weight: 500;
+  z-index: 9999;
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.toast.hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(20px);
+  pointer-events: none;
+}
+
+/* KELOMPOK KODE: Navbar Menu (Untuk halaman dashboard dll) */
+.navbar {
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem;
+  position: relative;
+  z-index: 100; /* Memberikan prioritas z-index agar navbar dan dropdown tampil paling atas */
+}
+
+/* KELOMPOK KODE: Hamburger Menu Styling */
+.hamburger {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--primary-color);
+  user-select: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: calc(var(--radius)/2);
+  transition: background 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+  background: rgba(255,255,255,0.5);
+  color: var(--primary-color);
+}
+
+.dropdown { position: relative; }
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  padding: 0.5rem 0;
+  z-index: 101; /* Mengatur z-index lebih tinggi untuk dropdown agar muncul di atas hover-cards */
+}
+
+.dropdown:hover .dropdown-content { display: block; }
+
+.dropdown-content a {
+  display: block;
+  padding: 10px 15px;
+}
+
+/* KELOMPOK KODE: Kontainer Utama */
+.container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.greeting-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* KELOMPOK KODE: Tabel untuk Informasi Stok */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+th {
+  background: rgba(255,255,255,0.4);
+  font-weight: 600;
+}
+
+/* KELOMPOK KODE: Tampilan Tracking Progress / Timeline */
+.tracking-result {
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.timeline {
+  list-style: none;
+  border-left: 2px solid var(--primary-color);
+  padding-left: 1.5rem;
+  margin-top: 1rem;
+}
+
+.timeline li {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.timeline li::before {
+  content: '';
+  position: absolute;
+  left: -29px;
+  top: 0;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  border: 3px solid white;
+}
+
+/* KELOMPOK KODE: Responsivitas Mobile */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block; /* Menampilkan icon hamburger pada smartphone */
+    z-index: 1001; /* Memastikan tombol close/hamburger selalu berada di atas overlay */
+    position: relative;
+  }
+  .navbar {
+    flex-wrap: wrap; /* Mengizinkan wrap ke bawah jika layar sempit */
+  }
+  .nav-links {
+    display: none; /* Menyembunyikan menu secara default pada mode mobile */
+    flex-direction: column;
+    justify-content: center; /* Menengahkan menu secara vertikal */
+    align-items: center; /* Menengahkan menu secara horizontal */
+    
+    /* KELOMPOK KODE: Membuat menu berada di dalam container kotak tengah layar */
+    width: 90vw;
+    max-width: 350px;
+    height: auto;
+    max-height: 65vh; /* Mencegah menu kepanjangan di layar mobile */
+    padding: 2.5rem 1rem; 
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.96); /* Mengurangi transparansi agar lebih mudah dibaca, tapi tetap clean */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    
+    /* GANTI TEKNIK POSISI: Menggunakan absolute menghindari bug dari backdrop-filter */
+    /* Menu ditampilkan ke arah bawah navbar sehingga berada secara visual di tengah layar */
+    position: absolute;
+    top: calc(100% + 10vh); 
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    gap: 1.5rem; 
+    overflow-y: auto; /* Izinkan scroll jika layar sangat kecil */
+  }
+  .nav-links.active {
+    display: flex; /* Menampilkan menu yang di toggle */
+    /* Memberikan efek bayangan gelap yang menutupi area luar kotak menu */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2), 0 0 0 100vmax rgba(0,0,0,0.5);
+  }
+  .nav-links a {
+    font-size: 1.1rem; /* Ukuran font disesuaikan agar tidak terlalu besar */
+    font-weight: 500;
+  }
+  .dropdown-content {
+    position: relative;
+    top: auto; /* Memperbaiki bug menu melayang terlalu jauh karena top: 100% sebelumnya */
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    padding: 10px 0 0 0;
+    text-align: center; /* Memastikan sub-menu teks selaras ke tengah */
+  }
+  .dropdown-content a {
+    padding: 10px 15px;
+    font-size: 1rem; /* Sedikit lebih kecil dari menu utama supaya hierarki terlihat */
+  }
+  form#formTambahStok {
+    grid-template-columns: 1fr !important;
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* KELOMPOK KODE: Dashboard Hover Cards */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.dashboard-card {
+  padding: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 20px rgba(108, 99, 255, 0.2);
+  border-color: var(--primary-color);
+}
+
+.dashboard-card svg {
+  width: 48px;
+  height: 48px;
+  color: var(--primary-color);
+  transition: color 0.3s ease;
+}
+
+.dashboard-card:hover svg {
+  color: var(--secondary-color);
+}
+
+.dashboard-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}

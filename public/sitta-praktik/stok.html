@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITTA UT - Informasi Stok Bahan Ajar</title>
+    <!-- KELOMPOK KODE: Menyertakan aturan CSS yang terdefinisi di file terpisah -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-animated">
+    
+    <!-- KELOMPOK KODE: Susunan Navigasi Web (Navbar) -->
+    <nav class="navbar glass-container">
+        <h3 class="brand" style="color: var(--primary-color)">SITTA UT</h3>
+        <!-- KELOMPOK KODE: Hamburger Menu Icon untuk Mode Mobile -->
+        <div class="hamburger" id="hamburgerMenu">&#9776;</div>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="stok.html" class="active">Informasi Bahan Ajar</a></li>
+            <li><a href="tracking.html">Tracking Pengiriman</a></li>
+            <li class="dropdown">
+                <a href="#">Laporan &#9662;</a>
+                <div class="dropdown-content glass-container">
+                    <a href="#" class="coming-soon">Monitoring Progress DO Bahan Ajar</a>
+                    <a href="#" class="coming-soon">Rekap Bahan Ajar</a>
+                </div>
+            </li>
+            <li><a href="#" class="coming-soon">Histori Transaksi Bahan Ajar</a></li>
+            <li><a href="index.html" style="color: var(--danger-color)">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- KELOMPOK KODE: Bagian penampil tabel informasi bahan ajar dinamis -->
+    <div class="container glass-container">
+        <h2 style="color: var(--primary-color);">Informasi Stok Bahan Ajar</h2>
+        <p style="margin-bottom: 20px;">Peragaan Data Bahan Ajar sesuai daftar inventaris</p>
+        
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="min-width: 80px;">Cover</th>
+                        <th style="min-width: 120px;">Kode Lokasi</th>
+                        <th style="min-width: 120px;">Kode Barang</th>
+                        <th style="min-width: 250px;">Nama Barang</th>
+                        <th style="min-width: 100px;">Stok</th>
+                    </tr>
+                </thead>
+                <!-- Tag tbody akan diinjeksi via manipulasi DOM Javascript dari data dummy JS -->
+                <tbody id="stokTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--glass-border)">
+        
+        <!-- KELOMPOK KODE: Formulir Penambahan Data Tabel (Operasi Push JS Array & Update View DOM) -->
+        <h3 style="color: var(--primary-color);">Tambah Stok Baru</h3>
+        <p style="margin-bottom: 15px; font-size: 0.9em;">Fitur penambahan baris data stok secara langsung (Live Update DOM)</p>
+        
+        <form id="formTambahStok" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: start;">
+            <input type="text" id="newLokasi" class="input-field" placeholder="Kode Lokasi (Mis. JKT01)" required>
+            <input type="text" id="newKode" class="input-field" placeholder="Kode Barang (Mis. EKMA4310)" required>
+            <input type="text" id="newNama" class="input-field" placeholder="Nama Bahan Ajar" required>
+            <input type="number" id="newStok" class="input-field" placeholder="Jumlah Stok" required>
+            
+            <!-- Elemen masukan tipe file untuk mengambil data gambar cover buku -->
+            <div style="grid-column: span 2; display: flex; flex-direction: column; gap: 8px;">
+                <label for="newCover" style="font-weight: 500; font-size: 0.9rem; color: var(--text-dark);">Pilih Gambar Cover Bahan Ajar (Opsional):</label>
+                <div style="position: relative;">
+                    <input type="file" id="newCover" accept="image/*" class="input-field file-input" style="opacity: 0; position: absolute; z-index: -1; width: 0.1px; height: 0.1px;">
+                    <label for="newCover" class="btn-primary" style="display: inline-block; padding: 10px 20px; font-size: 0.85rem; font-weight: 500; border-radius: calc(var(--radius)/3);">Unggah Gambar 📤</label>
+                    <span id="fileNameDisplay" style="margin-left: 10px; font-size: 0.85rem; color: var(--text-light);">Belum ada file dipilih</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="grid-column: span 2; padding: 12px; margin-top: 10px;">Simpan Stok Baru ke Tabel</button>
+        </form>
+    </div>
+
+    <!-- KELOMPOK KODE: Container Box Notifikasi keberhasilan maupun error ketika menambahkan stok-->
+    <div id="toast" class="toast hidden"><span id="toastMsg"></span></div>
+
+    <!-- KELOMPOK KODE: Mengimpor Javascript -->
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
