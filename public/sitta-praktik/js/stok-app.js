@@ -20,6 +20,9 @@ var app = new Vue({
         filterReorder: false,
         sortBy: "judul", // Default sorting
 
+        // Menandai state mode edit
+        editIndex: null,
+
         // Model untuk Formulir Tambah Stok Baru (menggunakan v-model)
         formBaru: {
             kode: "",
@@ -30,7 +33,9 @@ var app = new Vue({
             harga: 0,
             qty: 0,
             safety: 0,
-            catatanHTML: ""
+            catatanHTML: "",
+            cover: "",
+            coverName: ""
         },
         
         // State untuk Hamburger Menu (Responsivitas Navbar)
@@ -95,34 +100,95 @@ var app = new Vue({
             this.filterReorder = false;
             this.sortBy = "judul";
         },
-        // Fungsi/Metode untuk menambahkan stok berdasarkan interaksi formulir pengguna
-        tambahStok() {
+        // Mempopulate state form berdasarkan item yang dipilih dari tabel
+        editStok(item) {
+            // Kita harus mencari index asli dalam array stok secara persis 
+            this.editIndex = this.stok.findIndex(s => s.kode === item.kode);
+            
+            // Masukkan nilai saat ini untuk field form
+            this.formBaru = {
+                kode: item.kode,
+                judul: item.judul,
+                kategori: item.kategori,
+                upbjj: item.upbjj,
+                lokasiRak: item.lokasiRak,
+                harga: item.harga,
+                qty: item.qty,
+                safety: item.safety,
+                catatanHTML: item.catatanHTML,
+                cover: item.cover || "",
+                coverName: ""
+            };
+
+            // Meng-scroll viewport ke form tersebut di bawah
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        },
+        // Membersihkan form jika edit tidak jadi 
+        batalEdit() {
+            this.editIndex = null;
+            this.formBaru = {
+                kode: "", judul: "", kategori: "", upbjj: "", lokasiRak: "",
+                harga: 0, qty: 0, safety: 0, catatanHTML: "", cover: "", coverName: ""
+            };
+        },
+        // Fitur upload file gambar (simulasi local object URL dan nama asset)
+        handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Simpan nama file asli dengan asumsi file tersebut nanti di-upload ke folder 'assets'
+                this.formBaru.cover = "assets/" + file.name;
+                this.formBaru.coverName = file.name; 
+                
+                // Gunakan URL.createObjectURL secara lokal sementara agar user bisa langsung lihat hasil upload
+                this.formBaru.cover = URL.createObjectURL(file);
+            }
+        },
+        // Fungsi/Metode untuk menambahkan / memperbarui stok berdasarkan interaksi formulir pengguna
+        simpanStok() {
             // Validasi Input Sederhana
             if (!this.formBaru.kode || !this.formBaru.judul || !this.formBaru.upbjj) {
                 alert("Mohon lengkapi kode, judul, dan UPBJJ.");
                 return;
             }
 
-            // Push data baru ke dalam array stok
-            this.stok.push({
-                kode: this.formBaru.kode,
-                judul: this.formBaru.judul,
-                kategori: this.formBaru.kategori || "UMUM",
-                upbjj: this.formBaru.upbjj,
-                lokasiRak: this.formBaru.lokasiRak || "-",
-                harga: parseInt(this.formBaru.harga) || 0,
-                qty: parseInt(this.formBaru.qty) || 0,
-                safety: parseInt(this.formBaru.safety) || 0,
-                catatanHTML: this.formBaru.catatanHTML || "-"
-            });
+            if (this.editIndex !== null) {
+                // Update ke Array (reaktif karena Object assign dan reference nya sama)
+                Object.assign(this.stok[this.editIndex], {
+                    judul: this.formBaru.judul,
+                    kategori: this.formBaru.kategori || "UMUM",
+                    upbjj: this.formBaru.upbjj,
+                    lokasiRak: this.formBaru.lokasiRak || "-",
+                    harga: parseInt(this.formBaru.harga) || 0,
+                    qty: parseInt(this.formBaru.qty) || 0,
+                    safety: parseInt(this.formBaru.safety) || 0,
+                    catatanHTML: this.formBaru.catatanHTML || "-",
+                    cover: this.formBaru.cover || ""
+                });
+                
+                alert("Data bahan ajar berhasil diperbarui!");
+                this.editIndex = null; // Exit keadaan ngedit 
+            } else {
+                // Push data baru ke dalam array stok
+                this.stok.push({
+                    kode: this.formBaru.kode,
+                    judul: this.formBaru.judul,
+                    kategori: this.formBaru.kategori || "UMUM",
+                    upbjj: this.formBaru.upbjj,
+                    lokasiRak: this.formBaru.lokasiRak || "-",
+                    harga: parseInt(this.formBaru.harga) || 0,
+                    qty: parseInt(this.formBaru.qty) || 0,
+                    safety: parseInt(this.formBaru.safety) || 0,
+                    catatanHTML: this.formBaru.catatanHTML || "-",
+                    cover: this.formBaru.cover || ""
+                });
+                alert("Bahan ajar berhasil ditambahkan!");
+            }
 
-            // Mengosongkan isian form kembali
+            // Mengosongkan isian form kembali standar
             this.formBaru = {
                 kode: "", judul: "", kategori: "", upbjj: "", lokasiRak: "",
-                harga: 0, qty: 0, safety: 0, catatanHTML: ""
+                harga: 0, qty: 0, safety: 0, catatanHTML: "", cover: "", coverName: ""
             };
-
-            alert("Bahan ajar berhasil ditambahkan!");
         }
     }
 });
