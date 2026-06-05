@@ -1,69 +1,593 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SITTA UT - Login</title>
-    <!-- KELOMPOK KODE: Menghubungkan file stylesheet eksternal -->
+    <title>SITTA UT - Tugas Praktik 3</title>
+    <!-- KELOMPOK KODE: Mengimpor CSS global -->
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- KELOMPOK KODE: Mengimpor Vue 2 via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+
+    <style>
+        /* Gaya tambahan khusus untuk SPA ini */
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Modal Custom Box */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .catatan-tooltip {
+            position: absolute;
+            background: #333;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            z-index: 10;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* Timeline Modern Polish (Gen Z Glassmorphism) */
+        .timeline {
+            list-style: none;
+            border-left: 3px dashed var(--primary-color);
+            padding-left: 2rem;
+            margin-top: 1.5rem;
+            position: relative;
+        }
+
+        .timeline-item {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 10px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: 0 0 8px var(--primary-color);
+            border: 2px solid #fff;
+            transition: all 0.3s;
+        }
+
+        .timeline-card {
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .timeline-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(108, 99, 255, 0.15);
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        .timeline-time {
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .timeline-desc {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* Not Found Error Card */
+        .not-found-card {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            color: var(--danger-color);
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(8px);
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .not-found-card h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .not-found-card p {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.85;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+    </style>
 </head>
-<body class="flex-center bg-animated">
-    
-    <!-- KELOMPOK KODE: Kotak Box Login dengan form authentication -->
-    <div class="glass-container login-box">
-        <div class="login-header">
-            <h2>Selamat Datang</h2>
-            <p>SITTA Universitas Terbuka</p>
-        </div>
-        
-        <form id="loginForm">
-            <div class="input-group">
-                <input type="email" id="email" class="input-field" placeholder="Email" required>
+
+<body class="bg-animated">
+
+    <div id="app">
+        <!-- KELOMPOK KODE: Rute Login (State-based routing). Mengalihkan user ke form login sebelum masuk dashboard. -->
+        <div v-if="currentRoute === 'login'" class="flex-center" style="min-height: 90vh;">
+            <div class="glass-container login-box"
+                style="margin: auto; width: 100%; max-width: 400px; padding: 2.5rem; text-align: center;">
+                <div class="login-header">
+                    <h2 style="font-weight: 700; color: var(--primary-color); margin-bottom: 0.5rem;">Selamat Datang
+                    </h2>
+                    <p style="color: var(--text-light); margin-bottom: 2rem; font-size: 0.9rem;">SITTA Universitas
+                        Terbuka</p>
+                </div>
+
+                <form @submit.prevent="handleLogin">
+                    <div class="input-group">
+                        <input type="email" v-model="loginEmail" class="input-field" placeholder="Email" required
+                            style="width: 100%; padding: 12px 16px; margin-bottom: 15px;">
+                    </div>
+                    <div class="input-group">
+                        <input type="password" v-model="loginPassword" class="input-field" placeholder="Password"
+                            required style="width: 100%; padding: 12px 16px; margin-bottom: 15px;">
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full" style="width: 100%;">Masuk</button>
+                    <p class="error-msg" v-if="loginError" style="color: #ff4d4d; margin-top: 15px; font-weight: 500;">{{ loginError }}</p>
+                </form>
             </div>
-            <div class="input-group">
-                <input type="password" id="password" class="input-field" placeholder="Password" required>
+        </div>
+
+        <!-- KELOMPOK KODE: Rute Dashboard utama yang tampil setelah login berhasil. -->
+        <div v-else>
+            <!-- KELOMPOK KODE: Navbar Navigasi SPA (Single Page Application) -->
+            <nav class="navbar glass-container">
+                <h3 class="brand" style="color: var(--primary-color)">SITTA UT</h3>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="tab-btn" :class="{active: currentTab === 'dashboard'}" @click="currentTab = 'dashboard'">Dashboard</button>
+                    <button class="tab-btn" :class="{active: currentTab === 'stok'}" @click="currentTab = 'stok'">Informasi Bahan Ajar</button>
+                    <button class="tab-btn" :class="{active: currentTab === 'tracking'}" @click="currentTab = 'tracking'">Tracking Pengiriman</button>
+                    
+                    <div class="dropdown">
+                        <button class="tab-btn">Laporan ▾</button>
+                        <div class="dropdown-content glass-container">
+                            <a href="#" @click.prevent="showComingSoon('Laporan Harian')">Laporan Harian</a>
+                            <a href="#" @click.prevent="showComingSoon('Laporan Bulanan')">Laporan Bulanan</a>
+                        </div>
+                    </div>
+                    
+                    <button class="tab-btn" :class="{active: currentTab === 'histori'}" @click.prevent="showComingSoon('Histori Transaksi Bahan Ajar')">Histori Transaksi Bahan Ajar</button>
+                    
+                    <!-- KELOMPOK KODE: Logout yang memicu fungsi handleLogout untuk membersihkan session dan kembali ke form login -->
+                    <button @click.prevent="handleLogout" class="tab-btn" style="color: var(--danger-color);">Logout</button>
+                </div>
+            </nav>
+
+            <div class="container glass-container" style="min-height: 70vh;">
+                <!-- Render komponen berdasarkan tab yang aktif (v-show) -->
+                <section v-show="currentTab === 'dashboard'">
+                    <dashboard-view :user-name="userName" :upbjj-list="state.upbjjList"
+                        :kategori-list="state.kategoriList"></dashboard-view>
+                </section>
+
+                <section v-show="currentTab === 'stok'">
+                    <!-- Passing data state.stok ke props items -->
+                    <stok-view :items="state.stok" :upbjj-list="state.upbjjList" :kategori-list="state.kategoriList"
+                        @delete-stok="handleDeleteStok"></stok-view>
+                </section>
+
+                <section v-show="currentTab === 'tracking'">
+                    <!-- Passing data state.tracking ke component -->
+                    <tracking-view :data="state.tracking" :upbjj-list="state.upbjjList" :paket-list="state.paket"
+                        @add-do="handleAddDO"></tracking-view>
+                </section>
             </div>
-            
-            <button type="submit" class="btn-primary w-full">Masuk</button>
-        </form>
-
-        <!-- KELOMPOK KODE: Navigasi link untuk reset password dan registrasi -->
-        <div class="login-links">
-            <a href="#" id="forgotBtn">Lupa password?</a>
-            <p>Belum punya akun? <a href="#" id="registerBtn">Daftar</a></p>
         </div>
+
+        <!-- Komponen Custom Modal (App Modal) -->
+        <app-modal ref="deleteModal"></app-modal>
+
+        <!-- KELOMPOK KODE: Elemen UI custom Toast bersyarat dengan class binding (SPA interactivity) -->
+        <div class="toast" :class="{hidden: !isToastVisible}">{{ toastMessage }}</div>
     </div>
 
-    <!-- KELOMPOK KODE: Indikator Alert Custom (Toast) untuk feedback error -->
-    <div id="toast" class="toast hidden">
-        <span id="toastMsg"></span>
-    </div>
+    <!-- ==================== TEMPLATES UNTUK KOMPONEN VUE ==================== -->
 
-    <!-- KELOMPOK KODE: Komponen Modal Box untuk Lupa Password -->
-    <div id="forgotModal" class="modal hidden">
-        <div class="modal-content glass-container">
-            <span class="close-btn" id="closeForgot">&times;</span>
-            <h3 style="color: var(--primary-color)">Lupa Password</h3>
-            <p style="font-size: 0.9rem; margin-top: 5px;">Masukkan email Anda untuk mereset password.</p>
-            <input type="email" class="input-field mt-3" placeholder="Masukkan Email">
-            <button class="btn-primary w-full mt-3">Kirim Link Reset</button>
+    <!-- Template Komponen Dashboard -->
+    <template id="tpl-dashboard">
+        <div style="text-align: center; padding: 10px 0;">
+            <!-- Menampilkan pesan sapaan secara dinamis dari Vue computed property -->
+            <h2 class="greeting-text"
+                style="font-size: 1.8rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-dark);">{{
+                dynamicGreeting }}</h2>
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Dashboard Aplikasi Web SITTA. Silakan pilih menu
+                interaktif di bawah ini.</p>
+
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+                <!-- Menggunakan v-for untuk merender list Kategori dari Vue data -->
+                <div class="glass-container"
+                    style="min-width: 250px; padding: 20px; text-align: left; flex: 1; max-width: 400px;">
+                    <h4
+                        style="color: var(--primary-color); margin-bottom: 15px; font-weight: 600; border-bottom: 2px solid var(--glass-border); padding-bottom: 8px;">
+                        Daftar Kategori</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li v-for="(kat, index) in kategoriList" :key="'kat-'+index"
+                            style="padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-weight: 500;">
+                            📘 {{ kat }}
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Menggunakan v-for untuk merender list UPBJJ dari Vue data -->
+                <div class="glass-container"
+                    style="min-width: 250px; padding: 20px; text-align: left; flex: 1; max-width: 400px;">
+                    <h4
+                        style="color: var(--primary-color); margin-bottom: 15px; font-weight: 600; border-bottom: 2px solid var(--glass-border); padding-bottom: 8px;">
+                        Daftar UPBJJ-UT</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li v-for="(upbjj, index) in upbjjList" :key="'upbjj-'+index"
+                            style="padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-weight: 500;">
+                            📍 {{ upbjj }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- KELOMPOK KODE: Visual / Layout Hover-effect Cards untuk Akses Cepat Menu -->
+            <div class="dashboard-grid" style="margin-top: 30px;">
+                <!-- Kartu 1: Informasi Bahan Ajar -->
+                <a href="#" @click.prevent="$parent.currentTab = 'stok'" class="glass-container dashboard-card"
+                    style="cursor: pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                    </svg>
+                    <h3>Informasi Bahan Ajar</h3>
+                </a>
+
+                <!-- Kartu 2: Tracking Pengiriman -->
+                <a href="#" @click.prevent="$parent.currentTab = 'tracking'" class="glass-container dashboard-card"
+                    style="cursor: pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                    </svg>
+                    <h3>Tracking Pengiriman</h3>
+                </a>
+
+                <!-- Kartu 3: Histori Transaksi -->
+                <a href="#" @click.prevent="$parent.showComingSoon('Histori Transaksi')" class="glass-container dashboard-card"
+                    style="cursor: pointer;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+                    <h3>Histori Transaksi</h3>
+                </a>
+            </div>
         </div>
-    </div>
+    </template>
 
-    <!-- KELOMPOK KODE: Komponen Modal Box untuk Mendaftar Akun Baru -->
-    <div id="registerModal" class="modal hidden">
-        <div class="modal-content glass-container">
-            <span class="close-btn" id="closeRegister">&times;</span>
-            <h3 style="color: var(--primary-color)">Daftar Akun Baru</h3>
-            <input type="text" class="input-field mt-3" placeholder="Nama Lengkap">
-            <input type="email" class="input-field mt-3" placeholder="Email SSO UT">
-            <input type="password" class="input-field mt-3" placeholder="Password">
-            <button class="btn-primary w-full mt-3">Daftar Sekarang</button>
+    <!-- Template Komponen Stock Table -->
+    <template id="tpl-stock">
+        <div>
+            <h2 style="color: var(--primary-color);">Daftar Stok Bahan Ajar</h2>
+
+            <!-- Area Filter Data -->
+            <div style="margin: 15px 0; display: flex; gap: 10px; flex-wrap: wrap;">
+                <select v-model="filterUpbjj" class="input-field" style="max-width: 200px;">
+                    <option value="">Semua UT-Daerah</option>
+                    <option v-for="u in upbjjList" :key="u" :value="u">{{u}}</option>
+                </select>
+
+                <!-- Dependent options: Kategori muncul jika UPBJJ terpilih -->
+                <select v-if="filterUpbjj !== ''" v-model="filterKategori" class="input-field"
+                    style="max-width: 200px;">
+                    <option value="">Semua Kategori</option>
+                    <option v-for="k in kategoriList" :key="k" :value="k">{{k}}</option>
+                </select>
+
+                <select v-model="sortBy" class="input-field" style="max-width: 200px;">
+                    <option value="judul">Urut Berdasarkan: Judul</option>
+                    <option value="kode">Urut Berdasarkan: Kode</option>
+                    <option value="harga">Urut Berdasarkan: Harga</option>
+                    <option value="qty">Urut Berdasarkan: Stok (Qty)</option>
+                </select>
+
+                <label style="display:flex; align-items:center; gap: 5px;">
+                    <input type="checkbox" v-model="filterReorder"> Tampilkan Perlu Re-order
+                </label>
+
+                <button @click="resetFilter" class="btn-primary" style="padding: 10px 15px; font-size: 0.85rem;">Reset
+                    Filter</button>
+            </div>
+
+            <!-- Tabel Data -->
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">Cover</th>
+                            <th>Kode</th>
+                            <th>Judul</th>
+                            <th>Kategori</th>
+                            <th>UPBJJ</th>
+                            <th>Rak</th>
+                            <th>Harga</th>
+                            <th>Qty</th>
+                            <th>Safety</th>
+                            <th>Status</th>
+                            <th style="min-width: 140px;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in filteredItems" :key="item.kode">
+                            <!-- Kolom Cover: Menampilkan Gambar Cover Buku jika tersedia dari data JSON -->
+                            <td>
+                                <img v-if="item.cover" :src="item.cover" alt="Cover"
+                                    style="width: 50px; height: 70px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                <span v-else style="font-size: 0.8em; color: gray;">No Cover</span>
+                            </td>
+                            <td>{{ item.kode }}</td>
+                            <td>{{ item.judul }}</td>
+                            <td>{{ item.kategori }}</td>
+                            <td>{{ item.upbjj }}</td>
+                            <td>{{ item.lokasiRak }}</td>
+                            <!-- Menerapkan Formatting menggunakan Vue filter 'currency' -->
+                            <td>{{ item.harga | currency }}</td>
+                            <!-- Menerapkan Formatting menggunakan Vue filter 'suffixQty' -->
+                            <td>{{ item.qty | suffixQty }}</td>
+                            <td>{{ item.safety | suffixQty }}</td>
+
+                            <!-- Mouse Hover Event Handler -->
+                            <td @mouseover="showTooltip(item, $event)" @mouseleave="hideTooltip" style="cursor: help;">
+                                <!-- Menerapkan conditional operator untuk rendering view symbol -->
+                                <span v-if="item.qty === 0" style="color:var(--danger-color); font-weight:bold;">🔴
+                                    Kosong</span>
+                                <span v-else-if="item.qty < item.safety" style="color:orange; font-weight:bold;">⚠️
+                                    Menipis</span>
+                                <span v-else style="color:var(--success-color); font-weight:bold;">🟢 Aman</span>
+                            </td>
+                            <!-- Kolom Aksi dengan tombol Edit dan Hapus berdampingan (side-by-side) -->
+                            <td>
+                                <div style="display: flex; gap: 5px;">
+                                    <button @click="editItem(item)" class="btn-primary"
+                                        style="padding: 5px 10px; font-size:0.8rem; margin: 0;">Edit</button>
+                                    <button @click="confirmDelete(item.kode)" class="btn-primary"
+                                        style="padding: 5px 10px; font-size:0.8rem; background: var(--danger-color); margin: 0;">Hapus</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="filteredItems.length === 0">
+                            <td colspan="11" style="text-align:center; color: var(--text-light);">Tidak ada data.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tooltip Hover untuk Catatan HTML -->
+            <div v-show="tooltip.visible" class="catatan-tooltip"
+                :style="{top: tooltip.y + 'px', left: tooltip.x + 'px'}" v-html="tooltip.content"></div>
+
+            <hr style="margin: 20px 0; border:1px solid var(--glass-border);">
+
+            <h3 style="color: var(--primary-color);">{{ formMode === 'edit' ? 'Update Data Stok' : 'Tambah Stok Baru' }}
+            </h3>
+            <p style="font-size:0.85rem; color: var(--text-light); margin-bottom: 10px;">Fitur penambahan baris data stok (Vue Data Binding)</p>
+
+            <!-- Form Mini untuk Create / Update -->
+            <form @submit.prevent="saveData" class="stok-form">
+                <input type="text" v-model="formInput.kode" class="input-field" placeholder="Kode Barang (Mis. EKMA4310)" :disabled="formMode === 'edit'" @keyup.enter="saveData" required>
+                <input type="text" v-model="formInput.judul" class="input-field" placeholder="Judul / Nama Bahan Ajar" @keyup.enter="saveData" required>
+                
+                <select v-model="formInput.kategori" class="input-field" @keyup.enter="saveData" required>
+                    <option value="" disabled>Pilih Kategori</option>
+                    <option v-for="k in kategoriList" :key="k" :value="k">{{k}}</option>
+                </select>
+                <select v-model="formInput.upbjj" class="input-field" @keyup.enter="saveData" required>
+                    <option value="" disabled>Pilih UPBJJ</option>
+                    <option v-for="u in upbjjList" :key="u" :value="u">{{u}}</option>
+                </select>
+                
+                <input type="text" v-model="formInput.lokasiRak" class="input-field" placeholder="Lokasi Rak (Cth: R4-B2)" @keyup.enter="saveData" required>
+                <input type="number" v-model.number="formInput.harga" class="input-field" placeholder="0" @keyup.enter="saveData" required>
+                
+                <input type="number" v-model.number="formInput.qty" class="input-field" placeholder="0" @keyup.enter="saveData" required>
+                <input type="number" v-model.number="formInput.safety" class="input-field" placeholder="0" @keyup.enter="saveData" required>
+                
+                <input type="text" v-model="formInput.catatanHTML" class="input-field btn-full-span" placeholder="Catatan HTML Opsional (Cth: <b>Baru</b>)" @keyup.enter="saveData">
+                
+                <div class="btn-full-span" style="display:flex; flex-direction: column; gap:5px;">
+                    <label style="font-size:0.85rem; font-weight:500;">Gambar Cover (Opsional):</label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <label class="btn-primary" style="padding: 8px 15px; font-size: 0.85rem; cursor: pointer; margin: 0;">
+                            Unggah Gambar 📤
+                            <input type="file" accept="image/*" @change="handleFileUpload" style="display: none;">
+                        </label>
+                        <span style="font-size:0.8rem; color:var(--text-light);">{{ formInput.coverName || 'Belum ada file dipilih' }}</span>
+                    </div>
+                </div>
+                
+                <div class="btn-full-span" style="display:flex; gap:10px; margin-top: 10px;">
+                    <button type="submit" class="btn-primary" style="flex:1;">Simpan Stok Baru</button>
+                    <button type="button" v-if="formMode === 'edit'" class="btn-primary" @click="resetForm" style="flex:1; background: var(--text-light);">Batal Edit</button>
+                </div>
+            </form>
+
         </div>
-    </div>
+    </template>
 
-    <!-- KELOMPOK KODE: Mengimpor file Javascript yang menyediakan logika aplikasi -->
+    <!-- Template Komponen Tracking -->
+    <template id="tpl-tracking">
+        <div>
+            <h2 style="color: var(--primary-color);">Tracking Pengiriman (Delivery Order)</h2>
+            <p>Gunakan tombol Enter untuk mencari, atau Esc untuk menghapus pencarian.</p>
+
+            <div style="margin: 15px 0;">
+                <!-- Keyboard events untuk eksekusi pencarian -->
+                <input type="text" v-model="searchQuery" class="input-field"
+                    placeholder="Cari Nomor DO (misal: DO2026-...) atau NIM..." @keyup.enter="doSearch"
+                    @keyup.esc="resetSearch" style="width: 100%; max-width: 500px;">
+                <button class="btn-primary" @click="doSearch">Cari</button>
+            </div>
+
+            <!-- Menampilkan Data Pencarian -->
+            <div v-if="selectedDO">
+                <h3 style="color: var(--text-dark); margin-top:20px;">Hasil Tracking: {{ selectedDO.id }}</h3>
+                <p>NIM: {{ selectedDO.nim }} - Nama: {{ selectedDO.nama }}</p>
+                <p>Ekspedisi: {{ selectedDO.ekspedisi }} - Status: {{ selectedDO.status }}</p>
+                <p>Tanggal Dikirim: {{ selectedDO.tanggalKirim | dateFormatter }}</p>
+
+                <ul class="timeline">
+                    <li v-for="(track, idx) in selectedDO.perjalanan" :key="idx" class="timeline-item">
+                        <div class="timeline-card glass-container">
+                            <span class="timeline-time">{{ track.waktu }}</span>
+                            <p class="timeline-desc">{{ track.keterangan }}</p>
+                        </div>
+                    </li>
+                </ul>
+                <div style="margin-top: 15px;">
+                    <input type="text" v-model="newProgress" class="input-field"
+                        placeholder="Tambahkan progress baru..." style="max-width: 300px;">
+                    <button class="btn-primary" @click="addProgress(selectedDO)">Update Progress</button>
+                </div>
+            </div>
+            <div v-else-if="hasSearched" class="not-found-card">
+                <h4>Resi Tidak Ditemukan</h4>
+                <p>Maaf, data tracking untuk nomor DO atau NIM yang Anda cari tidak dapat ditemukan. Silakan periksa
+                    kembali kata kunci pencarian Anda.</p>
+            </div>
+
+            <hr style="margin: 30px 0; border:1px solid var(--glass-border);">
+
+            <!-- Formulir Pembuatan DO Baru -->
+            <h3 style="color: var(--primary-color);">Buat Delivery Order (DO) Baru</h3>
+            <div class="stok-form" style="margin-top:20px;">
+                <input type="text" v-model="newDO.nomor" class="input-field" readonly
+                    style="background: rgba(0,0,0,0.05); cursor: not-allowed;" title="DO Tergenerate Otomatis">
+                <input type="text" v-model="newDO.nim" class="input-field" placeholder="NIM">
+                <input type="text" v-model="newDO.nama" class="input-field" placeholder="Nama Mahasiswa">
+                <select v-model="newDO.ekspedisi" class="input-field">
+                    <option value="" disabled>Pilih Ekspedisi</option>
+                    <option value="JNE Reguler">JNE Reguler</option>
+                    <option value="JNE Express">JNE Express</option>
+                    <option value="JNT">JNT</option>
+                    <option value="Sicepat">Sicepat</option>
+                </select>
+                <select v-model="newDO.paketObject" class="input-field">
+                    <option :value="null" disabled>Pilih Paket Bahan Ajar</option>
+                    <option v-for="p in paketList" :key="p.kode" :value="p">{{p.kode}} - {{p.nama}}</option>
+                </select>
+                <input type="date" v-model="newDO.tanggal" class="input-field"
+                    title="Tanggal (Otomatis Hari Ini jika kosong)">
+
+                <div v-if="newDO.paketObject" class="btn-full-span glass-container"
+                    style="padding: 15px; margin-top: 10px;">
+                    <p><strong>Isi Paket:</strong> {{ newDO.paketObject.isi.join(', ') }}</p>
+                    <p><strong>Total Harga:</strong> {{ newDO.paketObject.harga | currency }}</p>
+                </div>
+
+                <button class="btn-primary btn-full-span" @click="saveNewDO">Generate & Simpan DO</button>
+            </div>
+
+        </div>
+    </template>
+
+    <!-- Template Modal Peringatan (App Modal) -->
+    <template id="tpl-modal">
+        <div v-show="isOpen" class="modal-overlay">
+            <div class="modal-box">
+                <h3 style="color: var(--danger-color); margin-bottom: 10px;">{{ title }}</h3>
+                <p style="color: var(--text-dark); margin-bottom: 20px;">{{ message }}</p>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button class="btn-primary" @click="confirm" style="background: var(--danger-color);">Ya,
+                        Hapus</button>
+                    <button class="btn-primary" @click="close" style="background: var(--text-light);">Batal</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- KELOMPOK KODE: Scripts Component Architecture (Berurutan) -->
+    <!-- 0. Data Source -->
     <script src="js/data.js"></script>
-    <script src="js/script.js"></script>
+    <!-- 1. Components -->
+    <script src="js/components/app-modal.js"></script>
+    <script src="js/components/dashboard-view.js"></script>
+    <script src="js/components/stok-view.js"></script>
+    <script src="js/components/tracking-view.js"></script>
+    <!-- 2. Main App Instance Root -->
+    <script src="js/app.js"></script>
+
 </body>
+
 </html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SITTA UT - Login</title>
+    <!-- KELOMPOK KODE: Menghubungkan file stylesheet eksternal -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="flex-center bg-animated">
+    
+    <!-- KELOMPOK KODE: Kotak Box Login dengan form authentication -->
+    <div class="glass-container login-box">
+        <div class="login-header">
+            <h2>Selamat Datang</h2>
+            <p>SITTA Universitas Terbuka</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="email" id="email" class="input-field" placeholder="Email" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" class="input-field" placeholder="Password" required>
+            </div>
+            
+            <button type="submit" class="btn-primary w-full">Masuk</button>
+        </form>
+
+        <!-- KELOMPOK KODE: Navigasi link untuk reset password dan registrasi -->
+        <div class="login-links">
+            <a href="#" id="forgotBtn">Lupa password?</a>
+            <p>Belum punya akun? <a href="#" id="registerBtn">Daftar</a></p>
+        </div>
+    </div>
+
+    <!-- KELOMPOK KODE: Indikator Alert Custom (Toast) untuk feedback error -->
+    <div id="toast" class="toast hidden">
+        <span id="toastMsg"></span>
+    </div>
+
+    <!-- KELOMPOK KODE: Komponen Modal Box untuk Lupa Password -->
+    <div id="forgotModal" class="modal hidden">
+        <div class="modal-content glass-container">
+            <span class="close-btn" id="closeForgot">&times;</span>
+            <h3 style="color: var(--primary-color)">Lupa Password</h3>
+            <p style="font-size: 0.9rem; margin-top: 5px;">Masukkan email Anda untuk mereset password.</p>
+            <input type="email" class="input-field mt-3" placeholder="Masukkan Email">
+            <button class="btn-primary w-full mt-3">Kirim Link Reset</button>
+        </div>
+    </div>
+
+    <!-- KELOMPOK KODE: Komponen Modal Box untuk Mendaftar Akun Baru -->
+    <div id="registerModal" class="modal hidden">
+        <div class="modal-content glass-container">
+            <span class="close-btn" id="closeRegister">&times;</span>
+            <h3 style="color: var(--primary-color)">Daftar Akun Baru</h3>
+            <input type="text" class="input-field mt-3" placeholder="Nama Lengkap">
+            <input type="email" class="input-field mt-3" placeholder="Email SSO UT">
+            <input type="password" class="input-field mt-3" placeholder="Password">
+            <button class="btn-primary w-full mt-3">Daftar Sekarang</button>
+        </div>
+    </div>
+
+    <!-- KELOMPOK KODE: Mengimpor file Javascript yang menyediakan logika aplikasi -->
+    <script src="js/data.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
